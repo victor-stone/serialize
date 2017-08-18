@@ -1,0 +1,19 @@
+{
+  "name": "serialize",
+  "version": "0.0.1",
+  "description": "Utility for transforming on set of JS objects into another",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/victor-stone/serialize.git"
+  },
+  "author": "victor stone",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/victor-stone/serialize/issues"
+  },
+  "homepage": "https://github.com/victor-stone/serialize#readme"
+}
