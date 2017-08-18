@@ -1,3 +1,5 @@
+var Model = require('./model');
+
 /*
   Some things to note:
 
@@ -156,6 +158,8 @@ function serialize(jsonDataOrModel,model=null) {
   }
   return _serialize(jsonDataOrModel,model);
 }
+
+serialize.Model = Model;
 
 module.exports = serialize;
 

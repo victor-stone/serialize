@@ -75,8 +75,8 @@
       This becomes an array property called 'favoriteFiles' on the target
 
 ## API
-/**
-  serialize omnibus function can be called in two ways:
+
+serialize omnibus function can be called in two ways:
   
   serialize( modelClass)
   
