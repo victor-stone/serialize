@@ -76,19 +76,25 @@
 
 ## API
 
-serialize omnibus function can be called in two ways:
+ serialize omnibus function can be called in two ways:
   
-  serialize( modelClass)
-  
-    - this returns a function that takes a single argument 
-      (perfect for .then() !) that will serialize the incoming
-      result(s) in the model specified. If the incoming
-      result is an array, each result will be serialized 
-      in place.
+````  
+  serialize( {jsonData, model, ctx} )
+````
+
+  jsonData is the object you want to serizialize into the shape of the model
+
+  model is derived from the Model class and describes the transformation
+
+  ctx is you user data that will passed in to any get*() method translator
+
+  If jsonData is null this returns a function that takes a single argument 
+  (perfect for .then() !) that will serialize the incoming
+  result(s) in the model specified. If the incoming
+  result is an array, each result will be serialized 
+  in place.
       
-  serialize( objectToSerialize, modelClass ) 
-  
-    - This will perform the serialization immediately
-      on the first parameter. If that object is an
-      array, it will serialize each item in place
-      and return the array.
+  If jsonData is not null this will perform the serialization immediately
+  If that object is an array, it will serialize each item in place
+  and return the array.
+      

@@ -5,9 +5,10 @@
 
 class Model {
 
-  constructor(jsonData, bindParent) {
+  constructor(jsonData, bindParent,ctx) {
     Object.assign(this,jsonData);
     this._bindParent = bindParent;
+    this._ctx = ctx;
   }
 
 }
