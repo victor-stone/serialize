@@ -19,7 +19,8 @@ function _serialize(_ref) {
 
   if (Array.isArray(jsonData)) {
     return jsonData.map(function (data) {
-      return _serialize({ jsonData: data,
+      return _serialize({
+        jsonData: data,
         model: model,
         ctx: ctx,
         bindParent: bindParent
@@ -33,15 +34,39 @@ function _serialize(_ref) {
 
   if ('_modelSubtree' in model) {
 
-    var subTree = model._modelSubtree;
+    var nested = model._modelSubtree;
 
-    for (var propName in subTree) {
+    // _modelSubtree : {
+    //    propName: ClassName
+    // }
+    for (var targetName in nested) {
 
-      target[propName] = _serialize({ jsonData: jsonData[propName] || {},
-        model: subTree[propName],
+      target[targetName] = _serialize({
+        jsonData: jsonData[targetName] || {},
+        model: nested[targetName],
         bindParent: jsonData,
         ctx: ctx
       });
+    }
+  }
+
+  if ('_nested' in model) {
+
+    var nested = model._nested;
+
+    for (var targetName in nested) {
+
+      for (var orgName in nested[targetName]) {
+
+        var modelName = nested[targetName][orgName];
+
+        target[targetName] = _serialize({
+          jsonData: jsonData[orgName] || {},
+          model: modelName,
+          bindParent: jsonData,
+          ctx: ctx
+        });
+      }
     }
   }
 
@@ -75,20 +100,18 @@ function _serialize(_ref) {
   return target;
 }
 
-function serialize(_ref2) {
-  var _ref2$jsonData = _ref2.jsonData,
-      jsonData = _ref2$jsonData === undefined ? null : _ref2$jsonData,
-      _ref2$model = _ref2.model,
-      model = _ref2$model === undefined ? null : _ref2$model,
-      _ref2$ctx = _ref2.ctx,
-      ctx = _ref2$ctx === undefined ? null : _ref2$ctx;
+function serialize() {
+  var json = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var model = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var ctx = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
-  if (jsonData === null) {
+  if (model === null) {
+    model = json;
     return function (jsonData) {
       return _serialize({ jsonData: jsonData, model: model, ctx: ctx });
     };
   }
-  return _serialize({ jsonData: jsonData, model: model, ctx: ctx });
+  return _serialize({ jsonData: json, model: model, ctx: ctx });
 }
 
 serialize.Model = _model2.default;

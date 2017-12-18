@@ -1,11 +1,12 @@
 {
   "name": "serialize",
-  "version": "0.0.1",
-  "description": "Utility for transforming on set of JS objects into another",
+  "version": "0.2.0",
+  "description": "Utility for transforming one set of JS objects into another",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src/index.js > dist/index.js && babel src/model.js > dist/model.js"
+    "test": "node test",
+    "build": "npx babel-cli src/index.js > dist/index.js && npx babel-cli src/model.js > dist/model.js",
+    "build-g": "babel src/index.js > dist/index.js && babel src/model.js > dist/model.js"
   },
   "repository": {
     "type": "git",
@@ -18,14 +19,11 @@
   },
   "homepage": "https://github.com/victor-stone/serialize#readme",
   "babel": {
-    "presets" : [
-      "es2015", 
-      "react"
-      ],
-    "plugins": [
-      "transform-class-properties",
-      "transform-object-rest-spread"
-      ]
+    "presets": [
+      "env"
+    ]
+  },
+  "devDependencies": {
+    "babel-preset-env": "^1.6.1"
   }
-
 }
