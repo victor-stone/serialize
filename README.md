@@ -264,23 +264,21 @@ class Track extends Model {
 
  serialize omnibus function can be called in two ways:
   
-````  
+````javascript
   serialize( jsonData, model, ctx )
 ````
 
-  jsonData is the object you want to serizialize into the shape of the model
+jsonData is the object you want to serizialize into the shape of the model
 
-  model is derived from the Model class and describes the transformation
+model is derived from the Model class and describes the transformation
 
-  ctx is you user data that will passed in to any get*() method translator
+ctx is you user data that will passed in to any get*() method translator
 
-  If jsonData is null this returns a function that takes a single argument 
-  (perfect for .then() !) that will serialize the incoming
-  result(s) in the model specified. If the incoming
-  result is an array, each result will be serialized 
-  in place.
+If jsonData object is an array, it will serialize each item in place and return the array.
+
+````javascript
+  serialize( model, ctx )
+````
+This returns a function that takes a single argument (perfect for .then() !) that will serialize the incoming result(s) in the model specified. If the incoming result is an array, each result will be serialized in place.
       
-  If jsonData is not null this will perform the serialization immediately
-  If that object is an array, it will serialize each item in place
-  and return the array.
-      
+    
