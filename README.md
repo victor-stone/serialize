@@ -11,50 +11,33 @@ This library is perfect for when you have multiple incoming formats that you wan
 
 ## Import a simple, single REST object
 
-Boring flacid JSON object
-````json
-{
+````javascript
+import serialize, { Model } from 'serialize';
+
+const jsonData = {
   "OrderUuid": "6a788cef-807e-fffe-b327-f3e76832987c",
   "Exchange": "BTC-START",
   "TimeStamp": "2017-12-17T21:25:15.1",
   "OrderType": "LIMIT_SELL",
   "Limit": 0.00000564,
   "Quantity": 895.82308862
-}
-````
-
-Describe how to convert. In this case we are just renaming some properties:
-
-````javascript
-// my-models.js
-import { Model } from 'serialize';
+};
 
 class MyImporter extends Model {
-  constructor() {
-    super(...arguments);
-
+  describe() {
     this.idBinding = 'OrderUuid';
     this.tickerBinding = 'Exchange';
     this.priceBinding = 'Limit';
     this.quantityBinding = 'Quantity';
   }
 }
+
+const { id, ticker, price, quantity } = serialize(jsonData,MyImporter);
+
 ````
-Note the derivation of Model is NOT the final object being created in the import. It is a class that is executed during the conversion/importing. 
+**NB** the derivation of Model is *not* the final object being created in the import. It is a class that is executed during the conversion/importing. 
 
-To get the final imported object described by your Model, call `serialize`. Here we do it on a single object:
-
-````javascript
-// fetch-data.js
-import serialzie from 'serialize';
-import MyModel from './my-model.js';
-
-... 
-const myData = serialize( rawJSONData, MyModel );
-....
-````
-
- `serialize` works great in Promises
+## Made for Promises
 
 ````javascript
 fetch('/myapi/fetch-single-object')
@@ -69,14 +52,14 @@ Which you can reduce to:
 ````javascript
 fetch('/myapi/fetch-single-object')
   
-  .then( serialize(MyModel) ) // <-- BOOM 
+  .then( serialize(MyModel) ) // <-- **BOOM**
   
   .then( ({ id, ticker, price, quanity }) => { ... } )
 ````
 
-## Import an array of REST objects
-If the data is an array of the same object the `serialize` call looks exactly the same but the return value is an array:
+## Import on Array
 
+Same syntax as single object
 
 ````javascript
 fetch('/myapi/fetch-array')
@@ -87,15 +70,14 @@ fetch('/myapi/fetch-array')
    } )
 ````
 
-## Customize importing for each property
+## Customize importing 
 
-Using a function to import:
+Prefix `get*` indicates a function to call during import
 
 ````javascript
 
 class MyImporter extends Model {
-  constructor() {
-    super(...arguments);
+  describe() {
 
     this.getSaleDate = () => new Date(this.TimeStamp);
     ...
@@ -108,11 +90,7 @@ const { saleDate } = serialize( jsonData, MyImporter );
 
 ````
 
-## Nested Imports
-
-You can map nested object in the original JSON to nested objects into the new shape.
-
-Note this JSON has a nested object ('topic_user') and a nested array ('topic_comments')
+## Import Nesting
 
 ````JSON
 // json from a fetch from /myapi/topic
@@ -136,34 +114,28 @@ Note this JSON has a nested object ('topic_user') and a nested array ('topic_com
 
 ````
 
-The outer JSON, the nested user and the comment object nested in the array all get their own import Model:
+See the `._nested` property.
 
 ````javascript
 // topic-import-model.js
 import { Model } from 'serialize';
 
 class MyNestedModel extends Model {
-  constructor() {
-    super(...arguments);
-
+  describe() {
     this.authorIdBinding = 'user_id';
     this.emailBinding = 'user_email';
   }
 }
 
 class MyNestedArrayElement extends Model {
-  constructor() {
-    super(...arguments);
-
+  describe() {
     this.commentorBinding = 'user_id';
     this.textBinding = 'comment';
   }
 }
 
 class MyOuterModel extends Model {
-  constructor() {
-    super(...arguments);
-
+  describe() {
     this.idBinding = 'topic_id';
     this.nameBinding = 'topic_title';
 
@@ -184,7 +156,8 @@ class MyOuterModel extends Model {
 fetch('/myapi/topic/4567')
   .then( serialize(MyOuterModel) ) 
   .then( myDataShape => { 
-    myDataShape.forEach( ({ id, name, author: { authorId, email} }, comments ) => { 
+    myDataShape.forEach( ({ id, name, author: { authorId, email} }, comments ) => 
+    { 
         comments.forEach( ({ commentor, text }) => { ... })
         ...
     ....
@@ -192,10 +165,6 @@ fetch('/myapi/topic/4567')
 ````
 
 ## Create nesting
-
-You can create a nesting from a flat JSON object.
-
-Say your legacy JSON data is flat:
 
 ````JSON
 [
@@ -209,8 +178,34 @@ Say your legacy JSON data is flat:
   }
 ````
 
-and you want to import this into a new shape:
+Use `_bindParent` property in the nested Model to access properties of the outer object. 
 
+Use `_modelSubtree` to describe the nesting in the outer Model.
+
+````javascript
+class Artist extends Model {
+  describe() {
+    idDisplay: '_bindParent.RecordingArtist',
+
+    getSort: () => {
+      const { RecordingArtist } = this._bindParent;
+      return RecordingArtist.split(/\s+/).reverse().join(', ');
+    }
+  }
+}
+
+class Track extends Model {
+  describe() {
+    trackBinding: 'Title',
+
+    _modelSubtree: {
+      artist: Artist
+    }
+  }
+}
+````
+
+Result:
 ````javascript
 [
   {
@@ -230,36 +225,6 @@ and you want to import this into a new shape:
 ]
 ````
 
-Use the `_bindParent` property in the nested Model to access properties of the outer object. This makes it easy to resuse the nested Model in several different contexts.
-
-Use `_modelSubtree` to describe the nesting in the outer Model.
-
-````javascript
-class Artist extends Model {
-  constructor() {
-    super(...arguments);
-
-    idDisplay: '_bindParent.RecordingArtist',
-
-    getSort: () => {
-      const { RecordingArtist } = this._bindParent;
-      return RecordingArtist.split(/\s+/).reverse().join(', ');
-    }
-  }
-}
-
-class Track extends Model {
-  constructor() {
-    super(...arguments);
-
-    trackBinding: 'Title',
-
-    _modelSubtree: {
-      artist: Artist
-    }
-  }
-}
-````
 # API
 
  serialize omnibus function can be called in two ways:
