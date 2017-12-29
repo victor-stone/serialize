@@ -42,6 +42,7 @@ class Parent extends Model {
     
     this.nameBinding = 'parent';
     this.getGender = () => genderNameMap[this.parent] || 'unknown';
+    this.getUUID = () => 
 
     this.getGender
   }
@@ -51,9 +52,11 @@ class MyModel extends Model {
 
   describe() {
 
+    this.__preserveCase = true;
+
     this.idBinding = 'foo';
 
-    this.getFee = () => this.bar * 2;
+    this.getUUID = () => this.bar * 2;
 
     this._modelSubtree = {
       me: Me
@@ -64,7 +67,7 @@ class MyModel extends Model {
       parents: { arr: Parent }
     }
 
-    this.getPatriarchy = () => this.arr.filter( ({parent}) => genderNameMap[parent] === 'leans toward male' );
+    this.getpatriarchy = () => this.arr.filter( ({parent}) => genderNameMap[parent] === 'leans toward male' );
   }
 }
 

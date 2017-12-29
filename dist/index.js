@@ -89,7 +89,7 @@ function _serialize(_ref) {
       if (propName2 !== null) {
         var s = propName2[1];
         if (typeof s === 'string') {
-          propName2 = s[0].toLowerCase() + s.substr(1);
+          propName2 = (model.__preserveCase ? s[0] : s[0].toLowerCase()) + s.substr(1);
 
           target[propName2] = model[k](target, ctx);
         }

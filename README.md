@@ -180,8 +180,6 @@ fetch('/myapi/topic/4567')
 
 Use `_bindParent` property in the nested Model to access properties of the outer object. 
 
-Use `_modelSubtree` to describe the nesting in the outer Model.
-
 ````javascript
 class Artist extends Model {
   describe() {
@@ -193,7 +191,11 @@ class Artist extends Model {
     }
   }
 }
+````
 
+Use `_modelSubtree` to describe the nesting in the outer Model.
+
+````javascript
 class Track extends Model {
   describe() {
     trackBinding: 'Title',
