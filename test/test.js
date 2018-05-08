@@ -125,7 +125,7 @@ if (typeof describe === 'undefined') {
             this._bindParent = 'foo'
             assert.ok(false)
           } catch (err) {
-            assert.ok((!(err instanceof TypeError))
+            assert.ok(err instanceof TypeError)
           }
         }
       }
