@@ -92,9 +92,7 @@ class TestModel2 extends Model {
 }
 
 if (typeof describe === 'undefined') {
-  const func = serialize(TestModel2)
-  const result = func(jsonData2)
-  assert.equal(result.select, jsonData2.raw)
+
 } else {
   describe('Serialize Tests', function () {
     it('should produce string', function () {
@@ -120,6 +118,19 @@ if (typeof describe === 'undefined') {
       assert.equal(result.yelling, 'DATA')
     })
 
+    it('should throw on access to _bindParent', function () {
+      class TestModel3 extends Model {
+        describe () {
+          try {
+            this._bindParent = 'foo'
+            assert.ok(false)
+          } catch (err) {
+            assert.ok((!(err instanceof TypeError))
+          }
+        }
+      }
+      serialize({}, TestModel3)
+    })
   })
 
 }

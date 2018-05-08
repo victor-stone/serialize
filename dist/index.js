@@ -132,7 +132,8 @@ function serialize() {
   var model = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
   var ctx = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
-  if (json instanceof Model) {
+  if (Model.isPrototypeOf(json)) {
+    ctx = model;
     model = json;
     return function (jsonData) {
       return _serialize({ jsonData: jsonData, model: model, ctx: ctx });

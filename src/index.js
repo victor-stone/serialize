@@ -115,7 +115,8 @@ function _serialize ({ jsonData, model, ctx, bindParent }) {
 }
 
 function serialize (json = null, model = null, ctx = null) {
-  if (Model.isPrototype(json)) {
+  if (Model.isPrototypeOf(json)) {
+    ctx = model
     model = json
     return jsonData => _serialize({ jsonData, model, ctx })
   }
