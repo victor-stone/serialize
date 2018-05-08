@@ -1,0 +1,11 @@
+{
+  "parser": "babel-eslint",
+  "extends": "standard",
+  "rules": {
+    "padded-blocks": 0,
+    "no-return-assign": 0
+},
+  "env": {
+    "mocha": true
+  }
+}

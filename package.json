@@ -1,12 +1,11 @@
 {
-  "name": "serialize",
-  "version": "0.2.0",
+  "name": "serialize-js-model",
+  "version": "1.1.0",
   "description": "Utility for transforming one set of JS objects into another",
   "main": "dist/index.js",
   "scripts": {
-    "test": "node test",
-    "build": "npx babel-cli src/index.js > dist/index.js && npx babel-cli src/model.js > dist/model.js",
-    "build-g": "babel src/index.js > dist/index.js && babel src/model.js > dist/model.js"
+    "test": "mocha",
+    "build": "babel src/index.js > dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -24,6 +23,7 @@
     ]
   },
   "devDependencies": {
-    "babel-preset-env": "^1.6.1"
+    "babel-preset-env": "^1.6.1",
+    "mocha": "^5.1.1"
   }
 }

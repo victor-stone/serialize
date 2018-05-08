@@ -93,36 +93,15 @@ smartFetch('/myapi/fetch-array') // <-- SAME AS ABOVE
 ## Advanced 
 
 
-### Handle nested JSON
+When the JSON has nested arrays or objects use the `._nested` property to describe the nested transformation
 
-````JSON
-// json from a fetch from /myapi/topic
-{
-  "topic_id": 1234,
-  "topic_name": "My Favorite Things",
-
-  "topic_comments": [
-      {
-        "user_id": 3434,
-        "comment": "awesome post!"
-      },
-      {
-        "user_id": 2321,
-        "comment": "not spam at all"
-      }
-  ]
-}
-````
-
-See the `._nested` property.
 
 ````javascript
-// topic-import-model.js
 import { Model } from 'serialize'
 
 class NestedComments extends Model {
-  async describe() {
-    this.getAuthor= () => await someDatabaseLookup(this.user_id)
+  describe() {
+    this.getAuthor = () => someDatabaseLookup(this.user_id)
     this.textBinding = 'comment'
   }
 }
@@ -138,74 +117,63 @@ export default class OuterTopic extends Model {
         'topic_comments': NestedComments
       }
     }
-
-````
-
-Meanwhile in JSX
-
-````javascript
-
-import OuterTopic from './topic-import-model'
-
-const serializer = serialize(OuterTopic)
-
-class MyComponent {
-
-  async componentWillMount() {
-    fetch( '/myapi/topic/' + this.props.topicId )
-      .then( serializer )
-      .then( data => this.setState({ data }) )
-  }
-
-  render () {
-    return <div className="comments">
-      {this.state.data.map(({ id, name, comments }) => 
-        <div key={id}>
-          <div>{name}</div>
-          <ul>
-            {comments.map(({ author, text }, index) => 
-              <li key={index}>{`${text} says ${author}`}</li>)}
-          </ul>
-        </div>
-      })
-    </div>
   }
 }
 
+const serializer = serialize(OuterTopic)
 
-## Create nesting from flat JSON
+const jsonData = {
+  "topic_id": 1234,
+  "topic_name": "My Favorite Things",
 
-````JSON
-[
-  {
-    "Title": "Purple Haze",
-    "RecordingArtist": "Jimi Hendrix"
-  },
-  {
-    "Title": "Revolution",
-    "RecordingArtist": "The Beatles"
-  }
-]
+  "topic_comments": [
+      {
+        "user_id": 3434,
+        "comment": "awesome post!"
+      },
+      {
+        "user_id": 2321,
+        "comment": "not spam at all"
+      }
+  ]
+}
+
+const result = serializer(jsonData)
+
+const {
+  id,
+  name,
+  comments
+} = result
+
+comments.forEach(comment => {
+  const {
+    text,
+    author
+  } = comment
+  ...
+})
 ````
 
+When you want the result to have a nested object (from a flat JSON) use `_modelSubtree` to describe the nesting in the outer Model.
+
 Use `_bindParent` property in the nested Model to access properties of the outer object. 
+
 
 ````javascript
 class Artist extends Model {
   describe() {
-    idDisplay: '_bindParent.RecordingArtist',
+    // When binding to property use quoted string
+    displayBinding: '_bindParent.RecordingArtist',
 
+    // when binding to function access through this. 
     getSort: () => {
       const { RecordingArtist } = this._bindParent;
       return RecordingArtist.split(/\s+/).reverse().join(', ');
     }
   }
 }
-````
 
-Use `_modelSubtree` to describe the nesting in the outer Model.
-
-````javascript
 class Track extends Model {
   describe() {
     trackBinding: 'Title',
@@ -216,61 +184,82 @@ class Track extends Model {
   }
 }
 ````
-
-Result:
 ````javascript
-[
+const jsonData = [
   {
-    track: 'Purple Haze',
-    artist: {
-      display: 'Jimi Hendrix',
-      sort: 'Hendrix, Jimi'
-    }
+    "Title": "Purple Haze",
+    "RecordingArtist": "Jimi Hendrix"
   },
   {
-    track: 'Revolution',
-    artist: {
-      display: 'The Beatles',
-      sort: 'Beatles, The'
-    }
+    "Title": "Revolution",
+    "RecordingArtist": "The Beatles"
   }
 ]
-````
 
+const results = serialize(jsonData, Track)
+
+results.forEach(result => {
+  const {
+    track,
+    artist: {
+      display,
+      sort
+    }
+  } = result
+  ....
+
+})
+````
+Use the third parameter to `serialize` to pass in context to every function transformer.
+
+````javascript
+class MyModel extends Model {
+  describe() {
+    this.getUser = (target, ctx) => ctx.db.lookup( this.UserId )
+  }
+}
+````
+````javascript
+import db from 'my-database-api'
+
+const jsonData = {
+  UserId: "`1234FEDC"
+}
+
+const { user } = serialize( jsonData, MyModel, { db } )
+````
 # API
 
  serialize omnibus function can be called in two ways:
   
 ````javascript
   const transformedData = serialize( jsonData, model, ctx )
+
+  // OR
+
+  const reusableFunc = serialize( model, ctx )
+
+  transformedData = reusableFunc( jsonData )
 ````
 
-`jsonData` is the object you want to serizialize into the shape of the model
+`jsonData` is the object or array of the data to serizialize into the shape of the model
 
 `model` is derived from the `Model` class and describes the transformation
 
 `ctx` is you user data that will passed in to any get*() method translator
 
-````javascript
-class MyModel extends Model {
-  describe() {
-    this.getUser = ctx => ctx.db.lookup(this.UserName)
-  }
-}
+## Model
+### Methods
 
-const { user } = serialize(jsonData, MyModel, { db })
+`describe` - derivations implement this to describe the transormation
 
-````
+### Properties
 
-If jsonData object is an array, it will serialize each item in place and return the array.
+`_modelSubtree` - declare this to describe an object or array nested in the final result
 
-Alternate calling syntax:
-````javascript
-  const reusableFunc = serialize( model, ctx )
-````
-This returns a function that takes a single argument (perfect for `.then()`) that will serialize the incoming result(s) in the model specified. If the incoming result is an array, each result will be serialized in place.
-````javascript
-const rec = reusableFunc(jsonData)
-````
-      
+`_bindParent` - access this in a nested `Model` to get access to outer Model's incoming JSON properties
+
+`_nested` - declare this to describe nested objects in the incoming JSON data
+
+ `__preserveCase` - declare this to disable default behavior of changing case of members
     

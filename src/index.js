@@ -1,9 +1,30 @@
-import Model from './model';
+class Model {
 
-function _serialize({ jsonData, model, ctx, bindParent }) {
+  constructor (jsonData, bindParent, ctx) {
+    Object.assign(this, jsonData)
+    Object.defineProperty(this, '_ctx', {
+      value: ctx,
+      writable: false
+    })
+    Object.defineProperty(this, '_bindParent', {
+      value: bindParent,
+      writable: false
+    })
+    this.describe()
+  }
+
+  /**
+   * derivations override this
+   */
+  describe () {
+
+  }
+}
+
+function _serialize ({ jsonData, model, ctx, bindParent }) {
 
   if (!jsonData) {
-    throw new Error("Missing JSON");
+    throw new Error('Missing JSON')
   }
 
   if (Array.isArray(jsonData)) {
@@ -12,40 +33,40 @@ function _serialize({ jsonData, model, ctx, bindParent }) {
       model,
       ctx,
       bindParent
-    }));
+    }))
   }
 
-  model = new model(jsonData, bindParent, ctx);
+  model = new model(jsonData, bindParent, ctx) // eslint-disable-line new-cap
 
-  var target = {};
+  var target = {}
 
   if ('_modelSubtree' in model) {
 
-    var nested = model._modelSubtree;
+    let nested = model._modelSubtree
 
     // _modelSubtree : {
     //    propName: ClassName
     // }
-    for (var targetName in nested) {
+    for (let targetName in nested) {
 
       target[targetName] = _serialize({
         jsonData: jsonData[targetName] || {},
         model: nested[targetName],
         bindParent: jsonData,
         ctx
-      });
+      })
     }
   }
 
   if ('_nested' in model) {
 
-    var nested = model._nested;
+    let nested = model._nested
 
-    for (var targetName in nested) {
+    for (let targetName in nested) {
 
       for (var orgName in nested[targetName]) {
 
-        var modelName = nested[targetName][orgName];
+        var modelName = nested[targetName][orgName]
 
         target[targetName] =
           _serialize({
@@ -53,67 +74,64 @@ function _serialize({ jsonData, model, ctx, bindParent }) {
             model: modelName,
             bindParent: jsonData,
             ctx
-          });
+          })
 
       }
     }
   }
 
-
   for (var k in model) {
 
-    var boundName = k.match(/^(.*)Binding$/);
+    var boundName = k.match(/^(.*)Binding$/)
 
     if (boundName !== null) {
-      boundName = boundName[1];
+      boundName = boundName[1]
       if (!target[boundName]) {
-        target[boundName] = pathValue(model, model[k]);
+        target[boundName] = pathValue(model, model[k])
       }
 
     } else if (k.match(/^set/)) {
 
-      target[k] = model[k];
+      target[k] = model[k]
 
     } else {
 
-      var propName2 = k.match(/^get(.*)$/);
+      var propName2 = k.match(/^get(.*)$/)
 
       if (propName2 !== null) {
-        var s = propName2[1];
+        var s = propName2[1]
         if (typeof s === 'string') {
           propName2 = (model.__preserveCase
-                        ? s[0]
-                        : s[0].toLowerCase()) + s.substr(1);
+            ? s[0]
+            : s[0].toLowerCase()) + s.substr(1)
 
-          target[propName2] = model[k](target, ctx);
+          target[propName2] = model[k](target, ctx)
         }
       }
     }
   }
 
-  return target;
+  return target
 }
 
-
-function serialize(json = null, model = null, ctx = null) {
-  if (model === null) {
-    model = json;
+function serialize (json = null, model = null, ctx = null) {
+  if (Model.isPrototype(json)) {
+    model = json
     return jsonData => _serialize({ jsonData, model, ctx })
   }
-  return _serialize({ jsonData:json, model, ctx });
+  return _serialize({ jsonData: json, model, ctx })
 }
 
-serialize.Model = Model;
-
-module.exports = serialize;
-
-function pathValue(obj, propName) {
-  var names = propName.split('.');
-  var value = obj[names[0]];
+function pathValue (obj, propName) {
+  var names = propName.split('.')
+  var value = obj[names[0]]
   for (var i = 1; i < names.length; i++) {
-    value = value[names[i]];
+    value = value[names[i]]
   }
-  return value;
+  return value
 }
 
+serialize.Model = Model
+
+module.exports = serialize
 

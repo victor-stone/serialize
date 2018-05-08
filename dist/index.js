@@ -1,10 +1,37 @@
 'use strict';
 
-var _model = require('./model');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _model2 = _interopRequireDefault(_model);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var Model = function () {
+  function Model(jsonData, bindParent, ctx) {
+    _classCallCheck(this, Model);
+
+    Object.assign(this, jsonData);
+    Object.defineProperty(this, '_ctx', {
+      value: ctx,
+      writable: false
+    });
+    Object.defineProperty(this, '_bindParent', {
+      value: bindParent,
+      writable: false
+    });
+    this.describe();
+  }
+
+  /**
+   * derivations override this
+   */
+
+
+  _createClass(Model, [{
+    key: 'describe',
+    value: function describe() {}
+  }]);
+
+  return Model;
+}();
 
 function _serialize(_ref) {
   var jsonData = _ref.jsonData,
@@ -14,7 +41,7 @@ function _serialize(_ref) {
 
 
   if (!jsonData) {
-    throw new Error("Missing JSON");
+    throw new Error('Missing JSON');
   }
 
   if (Array.isArray(jsonData)) {
@@ -28,7 +55,7 @@ function _serialize(_ref) {
     });
   }
 
-  model = new model(jsonData, bindParent, ctx);
+  model = new model(jsonData, bindParent, ctx); // eslint-disable-line new-cap
 
   var target = {};
 
@@ -52,15 +79,15 @@ function _serialize(_ref) {
 
   if ('_nested' in model) {
 
-    var nested = model._nested;
+    var _nested = model._nested;
 
-    for (var targetName in nested) {
+    for (var _targetName in _nested) {
 
-      for (var orgName in nested[targetName]) {
+      for (var orgName in _nested[_targetName]) {
 
-        var modelName = nested[targetName][orgName];
+        var modelName = _nested[_targetName][orgName];
 
-        target[targetName] = _serialize({
+        target[_targetName] = _serialize({
           jsonData: jsonData[orgName] || {},
           model: modelName,
           bindParent: jsonData,
@@ -105,7 +132,7 @@ function serialize() {
   var model = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
   var ctx = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
-  if (model === null) {
+  if (json instanceof Model) {
     model = json;
     return function (jsonData) {
       return _serialize({ jsonData: jsonData, model: model, ctx: ctx });
@@ -113,10 +140,6 @@ function serialize() {
   }
   return _serialize({ jsonData: json, model: model, ctx: ctx });
 }
-
-serialize.Model = _model2.default;
-
-module.exports = serialize;
 
 function pathValue(obj, propName) {
   var names = propName.split('.');
@@ -126,4 +149,8 @@ function pathValue(obj, propName) {
   }
   return value;
 }
+
+serialize.Model = Model;
+
+module.exports = serialize;
 
