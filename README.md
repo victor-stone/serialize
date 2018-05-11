@@ -16,7 +16,7 @@ Particuarly useful for when you have multiple incoming formats that you want to 
 ## Describe the Import
 
 ````javascript
-import serialize, { Model } from 'serialize'
+import serialize, { Model } from ''serialize-js-model'
 
 class MyModel extends Model {
   describe() {
@@ -97,7 +97,7 @@ When the JSON has nested arrays or objects use the `._nested` property to descri
 
 
 ````javascript
-import { Model } from 'serialize'
+import { Model } from ''serialize-js-model'
 
 class NestedComments extends Model {
   describe() {
@@ -235,11 +235,11 @@ const { user } = serialize( jsonData, MyModel, { db } )
 ````javascript
   const transformedData = serialize( jsonData, model, ctx )
 
-  // OR
+  // OR 
 
-  const reusableFunc = serialize( model, ctx )
+  const curriedSerialize = serialize( model, ctx )
 
-  transformedData = reusableFunc( jsonData )
+  transformedData = curriedSerialize( jsonData )
 ````
 
 `jsonData` is the object or array of the data to serizialize into the shape of the model
