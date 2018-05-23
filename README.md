@@ -16,7 +16,7 @@ Particuarly useful for when you have multiple incoming formats that you want to 
 ## Describe the Import
 
 ````javascript
-import serialize, { Model } from ''serialize-js-model'
+import serialize, { Model } from 'serialize-js-model'
 
 class MyModel extends Model {
   describe() {
@@ -97,7 +97,7 @@ When the JSON has nested arrays or objects use the `._nested` property to descri
 
 
 ````javascript
-import { Model } from ''serialize-js-model'
+import { Model } from 'serialize-js-model'
 
 class NestedComments extends Model {
   describe() {
