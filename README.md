@@ -12,24 +12,24 @@ Hot Buzzwords: functional, currying, data-last
 ````javascript
 import { mapper } from 'serialize-js-model'
 
-const mymapper = 
+const myMapper = 
   ({ ID: id, User: userId }) =>
     ({ id, userId, context: `imported` })
 
-const curriedMapper = mapper(mymapper)
+const curriedMapper = mapper(myMapper)
 
 fetch(url)
   .then(curriedMapper)
-  .then(data => ...)
+  .then(({ id, userId, context}) => ...)
 
-// works on single objects ('auto-box's)
+// works on single objects
 
-const oldRecord = {
+const oldObject = {
   ID: 123,
   User: 984
 }
 
-const newData = curriedMapper(oldRecord)
+const newObject = curriedMapper(oldObject)
 
 // also arrays 
 
