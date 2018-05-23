@@ -3,6 +3,11 @@
   "version": "2.0.0",
   "description": "Utility for transforming one set of JS objects into another",
   "main": "dist/index.js",
+  "keywords": [
+    "functional",
+    "serialize",
+    "data-last"
+  ],
   "scripts": {
     "test": "mocha",
     "build": "babel src/index.js > dist/index.js"
@@ -16,7 +21,7 @@
   "bugs": {
     "url": "https://github.com/victor-stone/serialize/issues"
   },
-  "homepage": "https://github.com/victor-stone/serialize#readme",
+  "homepage": "https://www.npmjs.com/package/serialize-js-model",
   "babel": {
     "presets": [
       "env"

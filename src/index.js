@@ -134,7 +134,7 @@ function pathValue (obj, propName) {
 
 serialize.Model = Model
 
-// all the code above has been replace
+// all the code above has been replaced
 // by the code below
 
 serialize.mapper = mapfunc => data => {
