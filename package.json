@@ -1,6 +1,6 @@
 {
   "name": "serialize-js-model",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Utility for transforming one set of JS objects into another",
   "main": "dist/index.js",
   "scripts": {
