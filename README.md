@@ -1,3 +1,6 @@
+# NOTE 
+This branch is serialize "classic" - it is not maintained but it preserved for backwards compat with inbound dependencies
+
 # About
 Convert butt-ugly, ancient crufty data shapes into beautifully semantically rich objects of desire.
 
