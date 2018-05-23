@@ -134,5 +134,15 @@ function pathValue (obj, propName) {
 
 serialize.Model = Model
 
+// all the code above has been replace
+// by the code below
+
+serialize.mapper = mapfunc => data => {
+  if (Array.isArray(data)) {
+    return data.map(mapfunc)
+  }
+  return mapfunc(data)
+}
+
 module.exports = serialize
 
